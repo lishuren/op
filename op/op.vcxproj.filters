@@ -80,6 +80,15 @@
     <Filter Include="libop">
       <UniqueIdentifier>{cfd85035-dbb8-416c-9f11-e7ebb83ee607}</UniqueIdentifier>
     </Filter>
+    <Filter Include="memory">
+      <UniqueIdentifier>{718db8c8-b455-4ffa-95b4-99dcd3935625}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Background\Keypad\winkeypad">
+      <UniqueIdentifier>{c7423282-1f6e-43f8-bf2e-435637f2b233}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Background\Display\Directx">
+      <UniqueIdentifier>{fb882fa3-8feb-4580-983a-05d65a8ae592}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -94,9 +103,6 @@
     <ClCompile Include="compreg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="op_i.c">
-      <Filter>生成的文件</Filter>
-    </ClCompile>
     <ClCompile Include="OpInterface.cpp">
       <Filter>Interface</Filter>
     </ClCompile>
@@ -108,9 +114,6 @@
     </ClCompile>
     <ClCompile Include="Bkmouse.cpp">
       <Filter>Background\Mouse</Filter>
-    </ClCompile>
-    <ClCompile Include="common.cpp">
-      <Filter>Common</Filter>
     </ClCompile>
     <ClCompile Include="ImageLoc.cpp">
       <Filter>Algorithm</Filter>
@@ -130,18 +133,6 @@
     <ClCompile Include="ImageProc.cpp">
       <Filter>ImageProc</Filter>
     </ClCompile>
-    <ClCompile Include="bkdisplay.cpp">
-      <Filter>Background\Display</Filter>
-    </ClCompile>
-    <ClCompile Include="ocr.cpp">
-      <Filter>Algorithm</Filter>
-    </ClCompile>
-    <ClCompile Include="Tool.cpp">
-      <Filter>Common</Filter>
-    </ClCompile>
-    <ClCompile Include="xhook.cpp">
-      <Filter>Background\Display</Filter>
-    </ClCompile>
     <ClCompile Include="query_api.cpp">
       <Filter>Background\Hook</Filter>
     </ClCompile>
@@ -153,6 +144,27 @@
     </ClCompile>
     <ClCompile Include="libop.cpp">
       <Filter>libop</Filter>
+    </ClCompile>
+    <ClCompile Include="globalVar.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="helpfunc.cpp">
+      <Filter>Common</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryEx.cpp">
+      <Filter>memory</Filter>
+    </ClCompile>
+    <ClCompile Include="op_i.c">
+      <Filter>生成的文件</Filter>
+    </ClCompile>
+    <ClCompile Include="xhook.cpp">
+      <Filter>Background\Hook</Filter>
+    </ClCompile>
+    <ClCompile Include="winkeypad.cpp">
+      <Filter>Background\Keypad\winkeypad</Filter>
+    </ClCompile>
+    <ClCompile Include="IDisplay.cpp">
+      <Filter>Background\Display</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -171,9 +183,6 @@
     <ClInclude Include="compreg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="op_i.h">
-      <Filter>生成的文件</Filter>
-    </ClInclude>
     <ClInclude Include="OpInterface.h">
       <Filter>Interface</Filter>
     </ClInclude>
@@ -185,9 +194,6 @@
     </ClInclude>
     <ClInclude Include="Cmder.h">
       <Filter>Cmd</Filter>
-    </ClInclude>
-    <ClInclude Include="Common.h">
-      <Filter>Common</Filter>
     </ClInclude>
     <ClInclude Include="Bkmouse.h">
       <Filter>Background\Mouse</Filter>
@@ -209,18 +215,6 @@
     </ClInclude>
     <ClInclude Include="ImageProc.h">
       <Filter>ImageProc</Filter>
-    </ClInclude>
-    <ClInclude Include="bkdisplay.h">
-      <Filter>Background\Display</Filter>
-    </ClInclude>
-    <ClInclude Include="ocr.h">
-      <Filter>Algorithm</Filter>
-    </ClInclude>
-    <ClInclude Include="Tool.h">
-      <Filter>Common</Filter>
-    </ClInclude>
-    <ClInclude Include="xhook.h">
-      <Filter>Background\Display</Filter>
     </ClInclude>
     <ClInclude Include="include\bitfunc.h">
       <Filter>头文件</Filter>
@@ -245,6 +239,33 @@
     </ClInclude>
     <ClInclude Include="libop.h">
       <Filter>libop</Filter>
+    </ClInclude>
+    <ClInclude Include="optype.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="globalVar.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="helpfunc.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MemoryEx.h">
+      <Filter>memory</Filter>
+    </ClInclude>
+    <ClInclude Include="op_i.h">
+      <Filter>生成的文件</Filter>
+    </ClInclude>
+    <ClInclude Include="xhook.h">
+      <Filter>Background\Hook</Filter>
+    </ClInclude>
+    <ClInclude Include="winkeypad.h">
+      <Filter>Background\Keypad\winkeypad</Filter>
+    </ClInclude>
+    <ClInclude Include="IDisplay.h">
+      <Filter>Background\Display</Filter>
+    </ClInclude>
+    <ClInclude Include="frameInfo.h">
+      <Filter>Common</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

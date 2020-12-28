@@ -101,6 +101,12 @@ EXTERN_C const IID IID_IOpInterface;
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetBasePath( 
             /* [retval][out] */ BSTR *path) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetID( 
+            /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetLastError( 
+            /* [retval][out] */ LONG *ret) = 0;
+        
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetShowErrorMsg( 
             /* [in] */ LONG show_type,
             /* [retval][out] */ LONG *ret) = 0;
@@ -116,6 +122,10 @@ EXTERN_C const IID IID_IOpInterface;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE EnablePicCache( 
             /* [in] */ LONG enable,
+            /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE CapturePre( 
+            /* [in] */ BSTR file_name,
             /* [retval][out] */ LONG *ret) = 0;
         
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE AStarFindPath( 
@@ -505,6 +515,35 @@ EXTERN_C const IID IID_IOpInterface;
             /* [in] */ LONG y,
             /* [retval][out] */ BSTR *ret) = 0;
         
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetDisplayInput( 
+            /* [in] */ BSTR method,
+            /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE LoadPic( 
+            /* [in] */ BSTR pic_name,
+            /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE FreePic( 
+            /* [in] */ BSTR Pic_name,
+            /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetScreenData( 
+            /* [in] */ LONG x1,
+            /* [in] */ LONG y1,
+            /* [in] */ LONG x2,
+            /* [in] */ LONG y2,
+            /* [out] */ VARIANT *data,
+            /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE GetScreenDataBmp( 
+            /* [in] */ LONG x1,
+            /* [in] */ LONG y1,
+            /* [in] */ LONG x2,
+            /* [in] */ LONG y2,
+            /* [out] */ VARIANT *data,
+            /* [out] */ VARIANT *size,
+            /* [retval][out] */ LONG *ret) = 0;
+        
         virtual /* [id] */ HRESULT STDMETHODCALLTYPE SetDict( 
             /* [in] */ LONG idx,
             /* [in] */ BSTR file_name,
@@ -573,9 +612,18 @@ EXTERN_C const IID IID_IOpInterface;
             /* [in] */ DOUBLE sim,
             /* [retval][out] */ BSTR *retstr) = 0;
         
-        virtual /* [id] */ HRESULT STDMETHODCALLTYPE CapturePre( 
-            /* [in] */ BSTR filename,
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE WriteData( 
+            /* [in] */ LONG hwnd,
+            /* [in] */ BSTR address,
+            /* [in] */ BSTR data,
+            /* [in] */ LONG size,
             /* [retval][out] */ LONG *ret) = 0;
+        
+        virtual /* [id] */ HRESULT STDMETHODCALLTYPE ReadData( 
+            /* [in] */ LONG hwnd,
+            /* [in] */ BSTR address,
+            /* [in] */ LONG size,
+            /* [retval][out] */ BSTR *retstr) = 0;
         
     };
     
@@ -652,6 +700,14 @@ EXTERN_C const IID IID_IOpInterface;
             IOpInterface * This,
             /* [retval][out] */ BSTR *path);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetID )( 
+            IOpInterface * This,
+            /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetLastError )( 
+            IOpInterface * This,
+            /* [retval][out] */ LONG *ret);
+        
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetShowErrorMsg )( 
             IOpInterface * This,
             /* [in] */ LONG show_type,
@@ -671,6 +727,11 @@ EXTERN_C const IID IID_IOpInterface;
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *EnablePicCache )( 
             IOpInterface * This,
             /* [in] */ LONG enable,
+            /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *CapturePre )( 
+            IOpInterface * This,
+            /* [in] */ BSTR file_name,
             /* [retval][out] */ LONG *ret);
         
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *AStarFindPath )( 
@@ -1132,6 +1193,40 @@ EXTERN_C const IID IID_IOpInterface;
             /* [in] */ LONG y,
             /* [retval][out] */ BSTR *ret);
         
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetDisplayInput )( 
+            IOpInterface * This,
+            /* [in] */ BSTR method,
+            /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *LoadPic )( 
+            IOpInterface * This,
+            /* [in] */ BSTR pic_name,
+            /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *FreePic )( 
+            IOpInterface * This,
+            /* [in] */ BSTR Pic_name,
+            /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetScreenData )( 
+            IOpInterface * This,
+            /* [in] */ LONG x1,
+            /* [in] */ LONG y1,
+            /* [in] */ LONG x2,
+            /* [in] */ LONG y2,
+            /* [out] */ VARIANT *data,
+            /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *GetScreenDataBmp )( 
+            IOpInterface * This,
+            /* [in] */ LONG x1,
+            /* [in] */ LONG y1,
+            /* [in] */ LONG x2,
+            /* [in] */ LONG y2,
+            /* [out] */ VARIANT *data,
+            /* [out] */ VARIANT *size,
+            /* [retval][out] */ LONG *ret);
+        
         /* [id] */ HRESULT ( STDMETHODCALLTYPE *SetDict )( 
             IOpInterface * This,
             /* [in] */ LONG idx,
@@ -1209,10 +1304,20 @@ EXTERN_C const IID IID_IOpInterface;
             /* [in] */ DOUBLE sim,
             /* [retval][out] */ BSTR *retstr);
         
-        /* [id] */ HRESULT ( STDMETHODCALLTYPE *CapturePre )( 
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *WriteData )( 
             IOpInterface * This,
-            /* [in] */ BSTR filename,
+            /* [in] */ LONG hwnd,
+            /* [in] */ BSTR address,
+            /* [in] */ BSTR data,
+            /* [in] */ LONG size,
             /* [retval][out] */ LONG *ret);
+        
+        /* [id] */ HRESULT ( STDMETHODCALLTYPE *ReadData )( 
+            IOpInterface * This,
+            /* [in] */ LONG hwnd,
+            /* [in] */ BSTR address,
+            /* [in] */ LONG size,
+            /* [retval][out] */ BSTR *retstr);
         
         END_INTERFACE
     } IOpInterfaceVtbl;
@@ -1262,6 +1367,12 @@ EXTERN_C const IID IID_IOpInterface;
 #define IOpInterface_GetBasePath(This,path)	\
     ( (This)->lpVtbl -> GetBasePath(This,path) ) 
 
+#define IOpInterface_GetID(This,ret)	\
+    ( (This)->lpVtbl -> GetID(This,ret) ) 
+
+#define IOpInterface_GetLastError(This,ret)	\
+    ( (This)->lpVtbl -> GetLastError(This,ret) ) 
+
 #define IOpInterface_SetShowErrorMsg(This,show_type,ret)	\
     ( (This)->lpVtbl -> SetShowErrorMsg(This,show_type,ret) ) 
 
@@ -1273,6 +1384,9 @@ EXTERN_C const IID IID_IOpInterface;
 
 #define IOpInterface_EnablePicCache(This,enable,ret)	\
     ( (This)->lpVtbl -> EnablePicCache(This,enable,ret) ) 
+
+#define IOpInterface_CapturePre(This,file_name,ret)	\
+    ( (This)->lpVtbl -> CapturePre(This,file_name,ret) ) 
 
 #define IOpInterface_AStarFindPath(This,mapWidth,mapHeight,disable_points,beginX,beginY,endX,endY,path)	\
     ( (This)->lpVtbl -> AStarFindPath(This,mapWidth,mapHeight,disable_points,beginX,beginY,endX,endY,path) ) 
@@ -1490,6 +1604,21 @@ EXTERN_C const IID IID_IOpInterface;
 #define IOpInterface_GetColor(This,x,y,ret)	\
     ( (This)->lpVtbl -> GetColor(This,x,y,ret) ) 
 
+#define IOpInterface_SetDisplayInput(This,method,ret)	\
+    ( (This)->lpVtbl -> SetDisplayInput(This,method,ret) ) 
+
+#define IOpInterface_LoadPic(This,pic_name,ret)	\
+    ( (This)->lpVtbl -> LoadPic(This,pic_name,ret) ) 
+
+#define IOpInterface_FreePic(This,Pic_name,ret)	\
+    ( (This)->lpVtbl -> FreePic(This,Pic_name,ret) ) 
+
+#define IOpInterface_GetScreenData(This,x1,y1,x2,y2,data,ret)	\
+    ( (This)->lpVtbl -> GetScreenData(This,x1,y1,x2,y2,data,ret) ) 
+
+#define IOpInterface_GetScreenDataBmp(This,x1,y1,x2,y2,data,size,ret)	\
+    ( (This)->lpVtbl -> GetScreenDataBmp(This,x1,y1,x2,y2,data,size,ret) ) 
+
 #define IOpInterface_SetDict(This,idx,file_name,ret)	\
     ( (This)->lpVtbl -> SetDict(This,idx,file_name,ret) ) 
 
@@ -1517,8 +1646,11 @@ EXTERN_C const IID IID_IOpInterface;
 #define IOpInterface_OcrAutoFromFile(This,file_name,sim,retstr)	\
     ( (This)->lpVtbl -> OcrAutoFromFile(This,file_name,sim,retstr) ) 
 
-#define IOpInterface_CapturePre(This,filename,ret)	\
-    ( (This)->lpVtbl -> CapturePre(This,filename,ret) ) 
+#define IOpInterface_WriteData(This,hwnd,address,data,size,ret)	\
+    ( (This)->lpVtbl -> WriteData(This,hwnd,address,data,size,ret) ) 
+
+#define IOpInterface_ReadData(This,hwnd,address,size,retstr)	\
+    ( (This)->lpVtbl -> ReadData(This,hwnd,address,size,retstr) ) 
 
 #endif /* COBJMACROS */
 

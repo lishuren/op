@@ -2,15 +2,11 @@
 #ifndef __IMAGE_H_
 #define __IMAGE_H_
 #include <vector>
-#ifndef min
-#define min
-#endif
-#ifndef max
-#define max
-#endif
+
 #include <atlimage.h>
 struct Image
 {
+	using iterator = unsigned __int32*;
 	Image() :width(0), height(0), pdata(nullptr) {
 	}
 	Image(int w, int h) :pdata(nullptr) {
@@ -45,6 +41,10 @@ struct Image
 		width = height = 0;
 		if (pdata)free(pdata);
 		pdata = nullptr;
+	}
+
+	int size() {
+		return width * height;
 	}
 	void clear() {
 		width = height = 0;
@@ -104,7 +104,7 @@ struct Image
 					*pdst++ = psrc[j];
 					*pdst++ = psrc[j];
 					*pdst++ = psrc[j];
-					*pdst++ = 0;
+					*pdst++ = 0xff;
 				}
 				psrc += pitch;
 
@@ -116,7 +116,7 @@ struct Image
 					*pdst++ = psrc[j * 3 + 0];
 					*pdst++ = psrc[j * 3 + 1];
 					*pdst++ = psrc[j * 3 + 2];
-					*pdst++ = 0;
+					*pdst++ = 0xff;
 				}
 				psrc += pitch;
 
@@ -148,12 +148,41 @@ struct Image
 		return (Tp*)(pdata + y * width * 4);
 	}
 
+	template<typename Tp>
+	const Tp* ptr(int y)const {
+		return (Tp*)(pdata + y * width * 4);
+	}
+
+	iterator begin() {
+		return (iterator)pdata;
+	}
+	iterator end() {
+		return (iterator)pdata + width * height;
+	}
+
+	iterator begin()const {
+		return (iterator)pdata;
+	}
+	iterator end()const {
+		return (iterator)pdata + width * height;
+	}
+
+	void fill(unsigned int val) {
+		std::fill(begin(), end(), val);
+	}
+	void fill(int row,int col,int h,int w,unsigned int val) {
+		for (int i = 0; i < h; ++i) {
+			auto p = ptr<unsigned int>(row + i)+col;
+			std::fill(p,p + w,val);
+		}
+	}
 
 	int width, height;
 	unsigned char* pdata;
 };
 //µ¥Í¨µÀÍ¼Ïñ
 struct ImageBin {
+	using iterator = unsigned char*;
 	ImageBin() :width(0), height(0) {}
 	ImageBin(const ImageBin& rhs) {
 		this->width = rhs.width;
@@ -166,6 +195,9 @@ struct ImageBin {
 	}
 	void clear() {
 		width = height = 0;
+	}
+	int size()const {
+		return width*height;
 	}
 	bool empty()const {
 		return width == 0;
@@ -194,13 +226,51 @@ struct ImageBin {
 		create(img4.width, img4.height);
 		auto psrc = img4.pdata;
 		for (int i = 0; i < pixels.size(); ++i) {
-			pixels[i] = (psrc[0] + psrc[1] + psrc[2]) / 3;
+			//pixels[i] = (psrc[0] + psrc[1] + psrc[2]) / 3;
+			// Gray = (R*299 + G*587 + B*114 + 500) / 1000
+			pixels[i] = (psrc[2] * 299 + psrc[1] * 587 + psrc[0] * 114 + 500) / 1000;
 			psrc += 4;
 		}
 	}
 
+	bool write(LPCTSTR file) {
+		if (empty())
+			return false;
+		ATL::CImage img;
+
+		img.Create(width, height, 32);
+		auto pdst = (unsigned char*)img.GetBits();
+		auto psrc = pixels.data();
+		int pitch = img.GetPitch();
+		for (int i = 0; i < height; ++i) {
+			for (int j = 0; j < width; ++j) {
+				//((int*)pdst)[j] = ((int*)psrc)[j];
+				uchar v = psrc[j] == 1 ? 0xff : 0;
+				pdst[j*4] = pdst[j*4 + 1] = pdst[j*4 + 2] =v;
+				pdst[j * 4 + 3] = 0xff;
+			
+			}
+			pdst += pitch;
+			psrc += width;
+		}
+		return img.Save(file) == S_OK;
+	}
+
+	iterator begin() {
+		return pixels.data();
+	}
+	iterator end() {
+		return pixels.data() + pixels.size();
+	}
 	int width, height;
 	std::vector<unsigned char> pixels;
 };
+
+
+using inputimg = const Image&;
+using outputimg = Image&;
+
+using inputbin = const ImageBin&;
+using outputbin = ImageBin & ;
 
 #endif

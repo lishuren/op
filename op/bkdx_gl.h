@@ -2,20 +2,22 @@
 #ifndef __DXBACKGROUND_H_
 #define __DXBACKGROUND_H_
 
-#include "Common.h"
 
-#include "bkdisplay.h"
-
-using std::wstring;
-class bkdo:public bkdisplay
+#include "IDisplay.h"
+struct Image;
+class bkdo:public IDisplay
 {
 public:
 	bkdo();
 	~bkdo();
 	//1
-	long Bind(HWND hwnd,long render_type) override;
+	long BindEx(HWND hwnd,long render_type) override;
 
-	long UnBind() override;
+	/*long UnBind(HWND hwnd);*/
+
+	long UnBindEx() override;
+
+	virtual bool requestCapture(int x1, int y1, int w, int h, Image& img)override;
 
 	//nox mode
 	long BindNox(HWND hwnd, long render_type);

@@ -6,11 +6,11 @@
 
 
 #include "op_i.h"
-#include "Common.h"
-#include "WinApi.h"
-#include "BKbase.h"
-#include "ImageProc.h"
-
+//#include "optype.h"
+//#include "WinApi.h"
+//#include "BKbase.h"
+//#include "ImageProc.h"
+#include "libop.h"
 #if defined(_WIN32_WCE) && !defined(_CE_DCOM) && !defined(_CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA)
 #error "Windows CE 平台(如不提供完全 DCOM 支持的 Windows Mobile 平台)上无法正确支持单线程 COM 对象。定义 _CE_ALLOW_SINGLE_THREADED_OBJECTS_IN_MTA 可强制 ATL 支持创建单线程 COM 对象实现并允许使用其单线程 COM 对象实现。rgs 文件中的线程模型已被设置为“Free”，原因是该模型是非 DCOM Windows CE 平台支持的唯一线程模型。"
 #endif
@@ -49,17 +49,22 @@ END_COM_MAP()
 	{
 	}
 private:
-	//一些共用变量
+	////一些共用变量
 
-	//1. Windows API
-	WinApi _winapi;
-	// background module
-	bkbase _bkproc;
-	// work path
-	std::wstring _curr_path;
-	//image process
-	ImageProc _image_proc;
-	std::map<wstring, long> _vkmap;
+	////1. Windows API
+	//WinApi _winapi;
+	//// background module
+	//bkbase _bkproc;
+	//// work path
+	//std::wstring _curr_path;
+	////image process
+	//ImageProc _image_proc;
+	//std::map<wstring, long> _vkmap;
+	//
+	////
+	//bytearray _screenData;
+	//bytearray _screenDataBmp;
+	libop obj;
 public:
 	//---------------基本设置/属性-------------------
 
@@ -71,6 +76,10 @@ public:
 	STDMETHOD(GetPath)(BSTR*path);
 	//获取插件目录
 	STDMETHOD(GetBasePath)(BSTR* path);
+	//
+	STDMETHOD(GetID)(LONG* ret);
+	//
+	STDMETHOD(GetLastError)(LONG* ret);
 	//设置是否弹出错误信息,默认是打开 0为关闭，1为显示为信息框，2为保存到文件
 	STDMETHOD(SetShowErrorMsg)(LONG show_type, LONG* ret);
 	
@@ -236,7 +245,14 @@ public:
 	STDMETHOD(FindPicEx)(LONG x1, LONG y1, LONG x2, LONG y2, BSTR files, BSTR delta_color, DOUBLE sim, LONG dir,BSTR* retstr);
 	//获取(x,y)的颜色
 	STDMETHOD(GetColor)(LONG x, LONG y, BSTR* ret);
-
+	//设置图像输入方式，默认窗口截图
+	STDMETHOD(SetDisplayInput)(BSTR mode, LONG* ret);
+	STDMETHOD(LoadPic)(BSTR pic_name, LONG* ret);
+	STDMETHOD(FreePic)(BSTR pic_name, LONG* ret);
+	//获取指定区域的图像,用二进制数据的方式返回
+	STDMETHOD(GetScreenData)(LONG x1, LONG y1, LONG x2, LONG y2, VARIANT* data, LONG* ret);
+	//获取指定区域的图像,用24位位图的数据格式返回,方便二次开发.（或者可以配合SetDisplayInput的mem模式）
+	STDMETHOD(GetScreenDataBmp)(LONG x1, LONG y1, LONG x2, LONG y2, VARIANT* data, VARIANT* size,LONG* ret);
 	//----------------------ocr-------------------------
 	//设置字库文件
 	STDMETHOD(SetDict)(LONG idx, BSTR file_name, LONG* ret);
@@ -250,14 +266,18 @@ public:
 	STDMETHOD(FindStr)(LONG x1, LONG y1, LONG x2, LONG y2,BSTR strs, BSTR color, DOUBLE sim, VARIANT* retx,VARIANT* rety,LONG* ret);
 	//返回符合color_format的所有坐标位置
 	STDMETHOD(FindStrEx)(LONG x1, LONG y1, LONG x2, LONG y2, BSTR strs, BSTR color, DOUBLE sim,BSTR* retstr);
-	//识别屏幕范围(x1,y1,x2,y2)内的字符串,自动二值化，而无需指定颜色
+	//识别屏幕范围(x1,y1,x2,y2)内的字符串,使用tesseract库识别
 	STDMETHOD(OcrAuto)(LONG x1, LONG y1, LONG x2, LONG y2, DOUBLE sim, BSTR* ret_str);
 	//从文件中识别图片
 	STDMETHOD(OcrFromFile)(BSTR file_name,BSTR color_format, DOUBLE sim, BSTR* retstr);
-	//从文件中识别图片,无需指定颜色
+	//从文件中识别图片,使用tesseract库识别
 	STDMETHOD(OcrAutoFromFile)(BSTR file_name, DOUBLE sim, BSTR* retstr);
 	
-
+	//-----------------------memory---------------------------------
+	//向某进程写入数据
+	STDMETHOD(WriteData)(LONG hwnd, BSTR address, BSTR data, LONG size, LONG* ret);
+	//读取数据
+	STDMETHOD(ReadData)(LONG hwnd, BSTR address, LONG size, BSTR* retstr);
 };
 
 OBJECT_ENTRY_AUTO(__uuidof(OpInterface), OpInterface)

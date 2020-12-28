@@ -2,6 +2,7 @@
 #include <string>
 #include "ImageLoc.h"
 #include <map>
+//#include <tesseract/baseapi.h>
 using std::wstring;
 /*
 此类为图像处理，包含以下工作
@@ -69,10 +70,13 @@ public:
 	std::map<wstring, Image> _pic_cache;
 	//是否使用图片缓存，默认开启
 	int _enable_cache;
+
+	//tesseract::TessBaseAPI _tes;
 	
 	
 private:
-	void str2colordfs(const wstring& color_str, std::vector<color_df_t>& colors);
+	//RETURN TYPE 0:word colors info; 1:bk color info
+	int str2colordfs(const wstring& color_str, std::vector<color_df_t>& colors);
 	void str2colors(const wstring& color, std::vector<color_t>& vcolor);
 	void files2mats(const wstring& files, std::vector<Image*>& vpic);
 };

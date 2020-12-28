@@ -2,45 +2,45 @@
 #include "stdafx.h"
 
 #include "bkdx_gl.h"
-#include "Tool.h"
+#include "globalVar.h"
+#include "helpfunc.h"
 #include <exception>
 #include "3rd_party/include/BlackBone/Process/Process.h"
 #include "3rd_party/include/BlackBone/Process/RPC/RemoteFunction.hpp"
 
+#include "./include/Image.hpp"
 
+#include "globalVar.h"
 
-
-
-bkdo::bkdo()
+bkdo::bkdo():IDisplay()
 {
-	_render_type = 0;
 }
 
 
 bkdo::~bkdo()
 {
-
+	//do clear
+	UnBindEx();
 }
 
 
-long bkdo::Bind(HWND hwnd, long render_type) {
-	//
+long bkdo::BindEx(HWND hwnd, long render_type) {
+	_hwnd = hwnd;
 	if (render_type == RDT_GL_NOX)
 		return BindNox(hwnd, render_type);
 	_render_type = render_type;
-	_hwnd = hwnd;
 	RECT rc;
 	//获取客户区大小
 	::GetClientRect(hwnd, &rc);
 	_width = rc.right - rc.left;
 	_height = rc.bottom - rc.top;
-	bind_init();
+	//bind_init();
 	if (render_type == RDT_GL_NOX) {
 	}
 	DWORD id;
 	::GetWindowThreadProcessId(_hwnd, &id);
 
-	
+
 
 	//attach 进程
 	blackbone::Process proc;
@@ -50,7 +50,7 @@ long bkdo::Bind(HWND hwnd, long render_type) {
 
 	long bind_ret = 0;
 	if (NT_SUCCESS(hr)) {
-		wstring dllname=g_op_name;
+		wstring dllname = g_op_name;
 		//检查是否与插件相同的32/64位,如果不同，则使用另一种dll
 		BOOL is64 = proc.modules().GetMainModule()->type == blackbone::eModType::mt_mod64;
 		if (is64 != OP64) {
@@ -91,55 +91,54 @@ long bkdo::Bind(HWND hwnd, long render_type) {
 		setlog(L"attach false.");
 	}
 	proc.Detach();
-	if (bind_ret) {
-		_bind_state = 1;
-
-	}
-	else {
-		bind_release();
-		_bind_state = 0;
-	}
 
 	return bind_ret;
 }
+//long bkdo::UnBind(HWND hwnd) {
+//	_hwnd = hwnd;
+//	_bind_state = 1;
+//	return UnBind();
+//}
 
-long bkdo::UnBind() {
+long bkdo::UnBindEx() {
+    //setlog("bkdo::UnBindEx()");
+	if (_render_type == RDT_GL_NOX)
+		return UnBindNox();
+	DWORD id;
+	::GetWindowThreadProcessId(_hwnd, &id);
 
-	if (_bind_state) {
-		if (_render_type == RDT_GL_NOX)
-			return UnBindNox();
-		DWORD id;
-		::GetWindowThreadProcessId(_hwnd, &id);
+	//attach 进程s
+	blackbone::Process proc;
+	NTSTATUS hr;
 
-		//attach 进程
-		blackbone::Process proc;
-		NTSTATUS hr;
+	hr = proc.Attach(id);
 
-		hr = proc.Attach(id);
-
-		if (NT_SUCCESS(hr)) {
-			wstring dllname = g_op_name;
-			//检查是否与插件相同的32/64位,如果不同，则使用另一种dll
-			BOOL is64 = proc.modules().GetMainModule()->type == blackbone::eModType::mt_mod64;
-			if (is64 != OP64) {
-				dllname = is64 ? L"op_x64.dll" : L"op_x86.dll";
-			}
-			using my_func_t = long(__stdcall*)(void);
-			auto pUnXHook = blackbone::MakeRemoteFunction<my_func_t>(proc, dllname, "UnXHook");
-			if (pUnXHook) {
-				pUnXHook();
-			}
-			else {
-				setlog(L"get unhook ptr false.");
-			}
+	if (NT_SUCCESS(hr)) {
+		wstring dllname = g_op_name;
+		//检查是否与插件相同的32/64位,如果不同，则使用另一种dll
+		BOOL is64 = proc.modules().GetMainModule()->type == blackbone::eModType::mt_mod64;
+		if (is64 != OP64) {
+			dllname = is64 ? L"op_x64.dll" : L"op_x86.dll";
+		}
+		using my_func_t = long(__stdcall*)(void);
+		auto pUnXHook = blackbone::MakeRemoteFunction<my_func_t>(proc, dllname, "UnXHook");
+		if (pUnXHook) {
+			pUnXHook();
+			BOOL fret = ::FreeLibrary((HMODULE)proc.modules().GetModule(dllname)->baseAddress);
+			//if (!fret)setlog("fret=%d", fret);
+			/*proc.modules().RemoveManualModule(dllname,
+				is64 ? blackbone::eModType::mt_mod64 : blackbone::eModType::mt_mod32);*/
 		}
 		else {
-			setlog("blackbone::MakeRemoteFunction false,errcode:%X,pid=%d,hwnd=%d", hr, id, _hwnd);
+			setlog(L"get unhook ptr false.");
 		}
-
-		proc.Detach();
 	}
-	bind_release();
+	else {
+		setlog("blackbone::MakeRemoteFunction false,errcode:%X,pid=%d,hwnd=%d", hr, id, _hwnd);
+	}
+
+	proc.Detach();
+	//bind_release();
 	return 1;
 }
 
@@ -151,9 +150,9 @@ long bkdo::BindNox(HWND hwnd, long render_type) {
 	::GetClientRect(hwnd, &rc);
 	_width = rc.right - rc.left;
 	_height = rc.bottom - rc.top;
-	bind_init();
+	//bind_init();
 
-	
+
 
 	//attach 进程
 	blackbone::Process proc;
@@ -161,7 +160,7 @@ long bkdo::BindNox(HWND hwnd, long render_type) {
 
 
 	wstring dllname = L"op_x64.dll";
-	
+
 
 	hr = proc.Attach(L"NoxVMHandle.exe");
 
@@ -202,46 +201,66 @@ long bkdo::BindNox(HWND hwnd, long render_type) {
 		setlog(L"attach false.");
 	}
 	proc.Detach();
-	if (bind_ret) {
-		_bind_state = 1;
 
-	}
-	else {
-		bind_release();
-		_bind_state = 0;
-	}
 
 	return bind_ret;
 }
 
 long bkdo::UnBindNox() {
-	if (_bind_state) {
-		//attach 进程
-		blackbone::Process proc;
-		NTSTATUS hr;
 
-		hr = proc.Attach(L"NoxVMHandle.exe");
-		wstring dllname = L"op_x64.dll";
-		
+	//attach 进程
+	blackbone::Process proc;
+	NTSTATUS hr;
 
-		if (NT_SUCCESS(hr)) {
+	hr = proc.Attach(L"NoxVMHandle.exe");
+	wstring dllname = L"op_x64.dll";
 
-			using my_func_t = long(__stdcall*)(void);
-			auto pUnXHook = blackbone::MakeRemoteFunction<my_func_t>(proc, dllname, "UnXHook");
-			if (pUnXHook) {
-				pUnXHook();
-			}
-			else {
-				setlog(L"get unhook ptr false.");
-			}
+
+	if (NT_SUCCESS(hr)) {
+
+		using my_func_t = long(__stdcall*)(void);
+		auto pUnXHook = blackbone::MakeRemoteFunction<my_func_t>(proc, dllname, "UnXHook");
+		if (pUnXHook) {
+			//pUnXHook();
+
+			/*BOOL fret = ::FreeLibrary((HMODULE)proc.modules().GetModule(dllname)->baseAddress);
+			if (!fret)setlog("fret=%d", fret);*/
 		}
 		else {
-			setlog("blackbone::MakeRemoteFunction false,errcode:%Xhwnd=%d", hr, _hwnd);
+			setlog(L"get unhook ptr false.");
 		}
-
-		proc.Detach();
 	}
-	bind_release();
+	else {
+		setlog("blackbone::MakeRemoteFunction false,errcode:%Xhwnd=%d", hr, _hwnd);
+	}
+
+	proc.Detach();
+
 	return 1;
+}
+
+
+
+bool bkdo::requestCapture(int x1, int y1, int w, int h, Image& img) {
+	img.create(w, h);
+	_pmutex->lock();
+	uchar* ppixels = _shmem->data<byte>()+sizeof(FrameInfo);
+	if (GET_RENDER_TYPE(_render_type) == RENDER_TYPE::DX) {//NORMAL
+		//setlog("cap1");
+		for (int i = 0; i < h; i++) {
+			memcpy(img.ptr<uchar>(i), ppixels + (i + y1) * 4 * _width + x1 * 4, 4 * w);
+		}
+	}
+	else {
+		//setlog("cap2");
+
+		for (int i = 0; i < h; i++) {
+			memcpy(img.ptr<uchar>(i), ppixels + (_height - 1 - i - y1) * _width * 4 + x1 * 4, 4 * w);
+		}
+	}
+
+
+	_pmutex->unlock();
+	return true;
 }
 

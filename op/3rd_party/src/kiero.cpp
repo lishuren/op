@@ -3,9 +3,9 @@
 #include <Windows.h>
 
 #ifdef KIERO_USE_MINHOOK
-//#include "../include/MinHook.h"
+#include "../include/MinHook.h"
 #endif
-#include <MinHook.h>
+//#include <MinHook.h>
 // Uncomment a needed graphical library (you can include all)
 #include <d3d9.h>          // D3D9
 #include <dxgi.h>          // D3D10/D3D11/D3D12 (must be included for d3d12 hook)
@@ -736,8 +736,9 @@ int kiero::unbind() {
 	int ret = -1;
 	if (g_renderType > 0)
 	{
+		MH_DisableHook(MH_ALL_HOOKS);
 		ret = MH_RemoveHook(MH_ALL_HOOKS);
-
+		
 		kiero::shutdown();
 		//MessageBoxA(NULL, MH_StatusToString((MH_STATUS)ret), "", 0);
 		//MH_DisableHook((void*)g_methodsTable[_index]);
